@@ -159,6 +159,26 @@
               </select>
             </div>
 
+            <!-- Character Set Selection -->
+            <div class="control-group">
+              <label>Character Set</label>
+              <select id="charSetSelect">
+                <option value="all" selected>All Characters (Default)</option>
+                <option value="binary">Binary Format (1-0)</option>
+                <option value="az">A-Z Only</option>
+                <option value="numbers">0-9 Only</option>
+                <option value="symbols">Symbols Only (@#/`2)</option>
+              </select>
+              <div
+                style="
+                  font-size: 0.75rem;
+                  color: var(--text-secondary);
+                  margin-top: 4px;
+                ">
+                <span id="charSetPreview">All Characters: 86 characters</span>
+              </div>
+            </div>
+
             <!-- Color Picker -->
             <div class="control-group">
               <label>

@@ -24,6 +24,8 @@ const contrastSlider = document.getElementById("contrastSlider");
 const brightnessSlider = document.getElementById("brightnessSlider");
 const fontSizeSelect = document.getElementById("fontSizeSelect");
 const qualitySelect = document.getElementById("qualitySelect");
+const charSetSelect = document.getElementById("charSetSelect");
+const charSetPreview = document.getElementById("charSetPreview");
 const colorModeCheck = document.getElementById("colorMode");
 const invertModeCheck = document.getElementById("invertMode");
 const themeToggle = document.getElementById("themeToggle");
@@ -52,98 +54,201 @@ const ratioValue = document.getElementById("ratioValue");
 const contrastValue = document.getElementById("contrastValue");
 const brightnessValue = document.getElementById("brightnessValue");
 
-// ====== ASCII Characters - FULL ======
-const ASCII_CHARS = [
-  " ",
-  ".",
-  ",",
-  ":",
-  ";",
-  "!",
-  "?",
-  "+",
-  "-",
-  "=",
-  "*",
-  "/",
-  "\\",
-  "|",
-  "(",
-  ")",
-  "[",
-  "]",
-  "{",
-  "}",
-  "<",
-  ">",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "0",
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-  "g",
-  "h",
-  "i",
-  "j",
-  "k",
-  "l",
-  "m",
-  "n",
-  "o",
-  "p",
-  "q",
-  "r",
-  "s",
-  "t",
-  "u",
-  "v",
-  "w",
-  "x",
-  "y",
-  "z",
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "H",
-  "I",
-  "J",
-  "K",
-  "L",
-  "M",
-  "N",
-  "O",
-  "P",
-  "Q",
-  "R",
-  "S",
-  "T",
-  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z",
-  "#",
-  "%",
-  "&",
-  "@",
-  "$",
-];
+// ====== Character Sets ======
+const CHARACTER_SETS = {
+  all: {
+    name: "All Characters",
+    chars: [
+      " ",
+      ".",
+      ",",
+      ":",
+      ";",
+      "!",
+      "?",
+      "+",
+      "-",
+      "=",
+      "*",
+      "/",
+      "\\",
+      "|",
+      "(",
+      ")",
+      "[",
+      "]",
+      "{",
+      "}",
+      "<",
+      ">",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "0",
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "q",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+      "z",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J",
+      "K",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P",
+      "Q",
+      "R",
+      "S",
+      "T",
+      "U",
+      "V",
+      "W",
+      "X",
+      "Y",
+      "Z",
+      "#",
+      "%",
+      "&",
+      "@",
+      "$",
+    ],
+  },
+  binary: {
+    name: "Binary Format",
+    chars: [" ", "1", "0"],
+  },
+  az: {
+    name: "A-Z Only",
+    chars: [
+      " ",
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "q",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+      "z",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J",
+      "K",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P",
+      "Q",
+      "R",
+      "S",
+      "T",
+      "U",
+      "V",
+      "W",
+      "X",
+      "Y",
+      "Z",
+    ],
+  },
+  numbers: {
+    name: "0-9 Only",
+    chars: [" ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+  },
+  symbols: {
+    name: "Symbols Only (@#/`2)",
+    chars: [
+      " ",
+      ".",
+      ",",
+      ":",
+      ";",
+      "!",
+      "?",
+      "+",
+      "-",
+      "=",
+      "*",
+      "/",
+      "\\",
+      "|",
+      "(",
+      ")",
+      "[",
+      "]",
+      "{",
+      "}",
+      "<",
+      ">",
+      "#",
+      "%",
+      "&",
+      "@",
+      "$",
+    ],
+  },
+};
 
 // ====== State ======
 let darkMode = true;
@@ -157,6 +262,7 @@ let currentHeight = 0;
 let isProcessing = false;
 let currentTab = "image";
 let customTextColor = "#e6edf3";
+let currentCharSet = "all";
 
 // ====== Theme ======
 themeToggle.addEventListener("click", () => {
@@ -198,6 +304,21 @@ contrastSlider.addEventListener("input", () => {
 brightnessSlider.addEventListener("input", () => {
   brightnessValue.textContent = brightnessSlider.value;
 });
+
+// ====== Character Set ======
+charSetSelect.addEventListener("change", () => {
+  const selected = charSetSelect.value;
+  currentCharSet = selected;
+  const set = CHARACTER_SETS[selected];
+  charSetPreview.textContent = `${set.name}: ${set.chars.length} characters`;
+
+  if (currentImage) {
+    processImage();
+  }
+});
+
+// Update preview on load
+charSetPreview.textContent = `All Characters: ${CHARACTER_SETS.all.chars.length} characters`;
 
 // ====== Color Picker ======
 textColorPicker.addEventListener("input", (e) => {
@@ -543,6 +664,7 @@ function convertImageToAscii(
   colorMode,
   invert,
   rotation,
+  charSet,
 ) {
   const height = Math.floor(img.height * (width / img.width) * ratio);
 
@@ -666,6 +788,10 @@ function convertImageToAscii(
   const range = maxGray - minGray;
   const hasRange = range > 0;
 
+  // Get selected character set
+  const selectedChars =
+    CHARACTER_SETS[charSet]?.chars || CHARACTER_SETS.all.chars;
+
   let grayIndex = 0;
   for (let y = 0; y < finalHeight; y++) {
     for (let x = 0; x < finalWidth; x++) {
@@ -692,8 +818,8 @@ function convertImageToAscii(
       }
 
       const normalized = gray / 255;
-      const charIndex = Math.floor(normalized * (ASCII_CHARS.length - 1));
-      const char = ASCII_CHARS[charIndex];
+      const charIndex = Math.floor(normalized * (selectedChars.length - 1));
+      const char = selectedChars[charIndex] || " ";
 
       asciiData.push({
         char: char,
@@ -824,6 +950,11 @@ function displayAscii(ascii, width, height, processingTime) {
   if (processingTime) {
     processingTimeEl.textContent = `⏱️ ${processingTime.toFixed(2)}ms`;
   }
+
+  // Update character set info
+  const selected = charSetSelect.value;
+  const set = CHARACTER_SETS[selected];
+  charSetPreview.textContent = `${set.name}: ${set.chars.length} characters`;
 
   renderImageTab();
 
@@ -1002,6 +1133,11 @@ function downloadHTML(
   const brightnessFactor = brightness / 100;
   let index = 0;
 
+  // Get selected character set
+  const selected = charSetSelect.value;
+  const set = CHARACTER_SETS[selected];
+  const charSetName = set.name;
+
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const data = asciiData[index++];
@@ -1170,7 +1306,8 @@ function downloadHTML(
       Dimensions: <span>${width} × ${height}</span> &nbsp;|&nbsp;
       Characters: <span>${asciiData.length.toLocaleString()}</span> &nbsp;|&nbsp;
       Quality: <span>${qualityName}</span> &nbsp;|&nbsp;
-      Mode: <span>${colorMode ? "Color" : "Monochrome"}</span>
+      Mode: <span>${colorMode ? "Color" : "Monochrome"}</span> &nbsp;|&nbsp;
+      Character Set: <span>${charSetName}</span>
     </div>
     <div class="ascii-container">
       <pre class="ascii-art">${asciiHTML}</pre>
@@ -1213,6 +1350,7 @@ async function processImage() {
   const colorMode = colorModeCheck.checked;
   const invert = invertModeCheck.checked;
   const rotation = currentRotation;
+  const charSet = charSetSelect.value;
 
   try {
     const {
@@ -1229,6 +1367,7 @@ async function processImage() {
       colorMode,
       invert,
       rotation,
+      charSet,
     );
 
     currentAsciiData = asciiData;
@@ -1337,6 +1476,7 @@ fontSizeSelect.addEventListener("change", () => {
 
 colorModeCheck.addEventListener("change", processImage);
 invertModeCheck.addEventListener("change", processImage);
+charSetSelect.addEventListener("change", processImage);
 
 // ====== Copy ======
 copyBtn.addEventListener("click", async () => {
@@ -1530,7 +1670,9 @@ document.addEventListener("keydown", (e) => {
 
 console.log("🎨 ASCII Art Pro loaded successfully!");
 console.log(
-  "📝 Using " + ASCII_CHARS.length + " characters including A-Z and 0-9",
+  "📝 Using " +
+    Object.keys(CHARACTER_SETS).length +
+    " character sets available",
 );
 console.log("🎨 Custom text color available!");
 console.log("🌐 Download HTML feature added!");
