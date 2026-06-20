@@ -1,8 +1,9 @@
+```markdown
 # 🎨 ASCII Art Pro
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![HTML](https://img.shields.io/badge/HTML-5-orange.svg)
 ![CSS](https://img.shields.io/badge/CSS-3-blueviolet.svg)
@@ -11,7 +12,7 @@
 
 **Convert any image to stunning ASCII art with professional-grade quality**
 
-[Features](#-features) • [Demo](#-live-demo) • [Installation](#-installation) • [Usage](#-usage) • [Screenshots](#-screenshots) • [Contributing](#-contributing) • [License](#-license)
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Screenshots](#-screenshots) • [Advanced Options](#-advanced-options) • [Character Sets](#-character-sets) • [Contributing](#-contributing) • [License](#-license)
 
 </div>
 
@@ -61,7 +62,64 @@ This is a **self-hosted ASCII Image Converter** designed for artists, computer e
 | **Color Presets**   | 8 predefined colors (Default, Red, Yellow, Green, Blue, Purple, Pink, Teal, Orange) |
 | **Invert Colors**   | Reverse colors for negative effect                                                  |
 
-### 📥 Export Options
+---
+
+## ⚙️ Advanced Options
+
+The **Advanced Options** panel provides fine-grained control over image processing and ASCII generation. Click the `⚙️ Advanced Options` button to expand or collapse these settings.
+
+### Image Adjustment Controls
+
+| Setting             | Range      | Description                                                                                                    |
+| ------------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
+| **Output Width**    | 100 - 600  | Controls the width of the output ASCII art in pixels. Higher values = more detail, larger file size            |
+| **Aspect Ratio**    | 0.3 - 0.8  | Adjusts the height-to-width ratio. Lower values create taller images, higher values create wider images        |
+| **Contrast**        | 0 - 200    | Increases or decreases the contrast between light and dark areas. Higher values create more defined characters |
+| **Brightness**      | 50% - 200% | Adjusts the overall brightness of the image. Higher values produce lighter output                              |
+| **Sharpness**       | 0 - 100    | Enhances edge definition and detail. 0 = normal, 100 = maximum sharpening                                      |
+| **Shadows**         | -50 to +50 | Adjusts shadow areas. Negative values darken shadows, positive values lighten them                             |
+| **Noise Reduction** | 0 - 100    | Reduces image noise and grain. 0 = none, 100 = maximum smoothing                                               |
+
+### How Advanced Options Work Together
+```
+
+Sharpness → Enhances edges and details
+↓
+Shadows → Adjusts dark areas for better visibility
+↓
+Noise Reduction → Smooths out unwanted grain and artifacts
+↓
+Brightness/Contrast → Final tone adjustment before ASCII conversion
+
+````
+
+---
+
+## 🔤 Character Sets
+
+ASCII Art Pro includes **5 pre-defined character sets** that determine which characters are used to build the ASCII art. You can switch between them in real-time to achieve different visual styles.
+
+| Character Set | Characters | Use Case |
+|---------------|------------|----------|
+| **All Characters** (Default) | 86 characters including letters, numbers, symbols | Most detailed and nuanced output |
+| **Binary Format** | ` ` (space), `1`, `0` | Minimalist, retro, or technical style |
+| **A-Z Only** | Space + lowercase and uppercase letters | Clean, readable, text-only output |
+| **0-9 Only** | Space + digits 0-9 | Numeric, data-like aesthetic |
+| **Symbols Only** | Space + `.`, `,`, `:`, `;`, `!`, `?`, `+`, `-`, `=`, `*`, `/`, `\`, `\|`, `(`, `)`, `[`, `]`, `{`, `}`, `<`, `>`, `#`, `%`, `&`, `@`, `$` | Artistic, expressive, or coding style |
+
+### Example Outputs by Character Set
+
+| Set | Example Character Progression (Dark→Light) |
+|-----|---------------------------------------------|
+| All Characters | ` .:;!?+-=*/` → `abcdefghijklmnopqrstuvwxyz` → `ABCDEFGHIJKLMNOPQRSTUVWXYZ` → `#%&@$` |
+| Binary Format | ` ` → `1` → `0` |
+| A-Z Only | ` ` → `a b c d e f g...` → `A B C D E F G...` |
+| 0-9 Only | ` ` → `1 2 3 4 5 6 7 8 9 0` |
+| Symbols Only | ` ` → `. , : ; ! ? + - = * / \ | ( ) [ ] { } < > # % & @ $` |
+
+---
+
+## 📥 Export Options
 
 | Format   | Quality    | File Size | Best For                       |
 | -------- | ---------- | --------- | ------------------------------ |
@@ -103,7 +161,7 @@ wget https://raw.githubusercontent.com/ManiTeymouri/ASCII-Art/main/script.js
 
 # Open in browser
 open index.html
-```
+````
 
 ### Method 2: Clone Repository
 
@@ -130,13 +188,7 @@ open index.html
 
 1. **Open** `index.html` in your browser
 2. **Upload** an image (drag & drop or click to browse)
-3. **Adjust** settings to your preference:
-   - Width
-   - Aspect Ratio
-   - Contrast
-   - Brightness
-   - Rotation
-   - Color settings
+3. **Adjust** settings to your preference
 4. **Preview** the result in the Image or ASCII tab
 5. **Export** your art in the format you need
 
@@ -151,39 +203,24 @@ Supported formats: PNG, JPG, JPEG, WEBP, BMP
 
 #### 2. Adjust Settings
 
-**Width**
+**Basic Controls (Always Visible)**
 
-- Control the output width (100-600 pixels)
-- Higher width = more detail, larger file size
+- **Rotate** - Rotate image 0°, 90°, 180°, or 270°
+- **PNG Output Quality** - Choose resolution (HD to 8K)
+- **Font Size** - Adjust the size of ASCII characters in the output
+- **Character Set** - Choose which characters to use for the ASCII art
+- **Color Mode** - Use original image colors or monochrome
+- **Invert Colors** - Reverse the color scheme
 
-**Aspect Ratio**
+**Advanced Options (Click "⚙️ Advanced Options" to expand)**
 
-- Adjust the height relative to width (0.3-0.8)
-- Lower = taller images, Higher = wider images
-
-**Contrast**
-
-- Increase for more defined characters (0-200)
-- Higher contrast = more variation between light and dark areas
-
-**Brightness**
-
-- Adjust overall brightness (50-200%)
-- Increase for lighter output, decrease for darker output
-
-**Rotate**
-
-- Rotate image 0°, 90°, 180°, or 270°
-
-**Color Mode**
-
-- **On**: Uses original image colors
-- **Off**: Uses custom color (monochrome)
-
-**Invert Colors**
-
-- **On**: Reverses colors (negative effect)
-- **Off**: Normal colors
+- **Output Width** - Control output width (100-600 pixels)
+- **Aspect Ratio** - Adjust height-to-width ratio (0.3-0.8)
+- **Contrast** - Fine-tune contrast (0-200)
+- **Brightness** - Adjust overall brightness (50-200%)
+- **Sharpness** - Enhance edge definition (0-100)
+- **Shadows** - Adjust dark areas (-50 to +50)
+- **Noise Reduction** - Reduce image noise (0-100)
 
 #### 3. Preview
 
@@ -210,58 +247,68 @@ Choose your output format:
 
 ### Dark Mode Interface
 
-_[Screenshot - Dark Mode Interface]_
-
 ![Dark Mode Interface](docs/darkmode.png)
 
 ### Light Mode Interface
 
-_[Screenshot - Light Mode Interface]_
-
 ![Light Mode Interface](docs/lightmode.png)
+
+### Advanced Options Panel
+
+![Advanced Options](docs/advanced-options.png)
+
+### Character Set Selection
+
+![Character Sets](docs/character-sets.png)
 
 ### Image Preview Tab
 
-_[Screenshot - Image Preview]_
-
-![Orginal Image](/docs/kill%20bill.png)
+![Original Image](docs/kill%20bill.png)
 
 ### ASCII Output Tab
 
-_[Screenshot - ASCII Output]_
-![ASCII Generate Image](/docs/kill%20bill%20ASCII.png)
+![ASCII Generate Image](docs/kill%20bill%20ASCII.png)
 
 ### Color Picker
-
-_[Screenshot - Color Picker]_
 
 ![Color Picker](docs/color%20options.png)
 
 ### Export Options
 
-_[Screenshot - Export Options]_
-
 ![Export Options](docs/export%20opitons.png)
 
 ---
+
+## 🔧 Technical Details
 
 ### Processing Pipeline
 
 ```mermaid
 graph LR
-    A[Upload Image] --> B[Denoise]
-    B --> C[Sharpen]
-    C --> D[Brightness/Contrast]
-    D --> E[Rotate]
-    E --> F[Convert to Grayscale]
-    F --> G[Map to ASCII]
-    G --> H[Apply Colors]
-    H --> I[Display/Export]
+    A[Upload Image] --> B[Noise Reduction]
+    B --> C[Shadows Adjustment]
+    C --> D[Sharpness Enhancement]
+    D --> E[Brightness/Contrast]
+    E --> F[Rotate]
+    F --> G[Convert to Grayscale]
+    G --> H[Map to Selected Character Set]
+    H --> I[Apply Colors]
+    I --> J[Display/Export]
 ```
 
-### Character Set
+### Character Sets
 
-The tool uses a carefully curated set of **86 characters** for optimal density and detail:
+The tool includes **5 carefully curated character sets** for different visual styles:
+
+| Character Set      | Number of Characters | Best For                    |
+| ------------------ | -------------------- | --------------------------- |
+| **All Characters** | 86                   | Maximum detail and nuance   |
+| **Binary Format**  | 3                    | Minimalist, retro aesthetic |
+| **A-Z Only**       | 53                   | Clean, readable output      |
+| **0-9 Only**       | 11                   | Numeric, data-like style    |
+| **Symbols Only**   | 27                   | Artistic, coding aesthetic  |
+
+### All Characters Set (86 characters)
 
 ```
 Space, ., ,, :, ;, !, ?, +, -, =, *, /, \, |, (, ), [, ], {, }, <, >,
@@ -273,6 +320,20 @@ a-z, A-Z,
 ---
 
 ## 🛠️ Customization
+
+### Adding a New Character Set
+
+Edit the `CHARACTER_SETS` object in `script.js`:
+
+```javascript
+const CHARACTER_SETS = {
+  // ... existing sets ...
+  custom: {
+    name: "My Custom Set",
+    chars: [" ", "@", "#", "$", "%", "&", "*", "!"],
+  },
+};
+```
 
 ### Changing the Character Set
 
@@ -296,13 +357,14 @@ const ASCII_CHARS = [
 ];
 ```
 
-### Adding Custom Presets
+### Adding Custom Color Presets
 
 Add new color presets in the HTML:
 
 ```html
 <button
   class="btn color-preset"
+  data-color="#YOUR_COLOR"
   style="background:#YOUR_COLOR; color:white; padding:4px 10px; font-size:0.75rem;">
   Your Color Name
 </button>
@@ -448,9 +510,6 @@ SOFTWARE.
 - Inspired by classic ASCII art generators and the creativity of the open-source community
 - Built with pure vanilla JavaScript for maximum compatibility and performance
 - Designed with GitHub's dark theme aesthetic for comfortable coding sessions
-- Special thanks to all contributors and users of this project
-
----
 
 ---
 
@@ -458,6 +517,8 @@ SOFTWARE.
 
 **Made with ❤️ by [ManiTeymouri](https://github.com/ManiTeymouri)**
 
-[⬆ Back to Top](#-ascii-art-pro)
+[⬆ Back to Top](#-Ascii-Art-Pro)
 
 </div>
+
+---
