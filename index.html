@@ -3,391 +3,447 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>ASCII Art Pro</title>
-
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="container">
-      <!-- Header -->
-      <div class="header">
-        <h1>🎨 ASCII Art Pro</h1>
-        <div class="header-controls">
-          <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
-            🌙
-          </button>
-        </div>
-      </div>
-
-      <!-- Drop Zone -->
-      <div class="drop-zone" id="dropZone">
-        <span class="icon">🖼️</span>
-        <p><strong>Drop your image here</strong> or click to browse</p>
-        <p style="font-size: 0.85rem; color: var(--text-secondary)">
-          PNG, JPG, JPEG, WEBP, BMP
-        </p>
-        <input type="file" id="upload" accept="image/*" />
-      </div>
-
-      <!-- Hidden Canvas -->
-      <canvas id="canvas" style="display: none"></canvas>
-
-      <!-- Main Grid -->
-      <div class="main-grid">
-        <!-- Left: Preview & Controls -->
-        <div>
-          <!-- Preview -->
-          <div class="preview-panel">
-            <h3>📷 Image Preview</h3>
-            <div class="preview-container" id="previewContainer">
-              <div class="placeholder" id="placeholder">
-                🖼️ Your image will appear here
-              </div>
-              <img id="previewImage" alt="Preview" />
-            </div>
-          </div>
-
-          <!-- Controls -->
-          <div class="controls">
-            <div class="control-group">
-              <label>
-                Output Width
-                <span id="widthValue">400</span>
-              </label>
-              <input
-                type="range"
-                id="widthSlider"
-                min="100"
-                max="600"
-                value="400"
-                step="10" />
-            </div>
-
-            <div class="control-group">
-              <label>
-                Aspect Ratio
-                <span id="ratioValue">0.80</span>
-              </label>
-              <input
-                type="range"
-                id="ratioSlider"
-                min="0.3"
-                max="0.8"
-                value="0.8"
-                step="0.01" />
-            </div>
-
-            <div class="control-group">
-              <label>
-                Contrast
-                <span id="contrastValue">90</span>
-              </label>
-              <input
-                type="range"
-                id="contrastSlider"
-                min="0"
-                max="200"
-                value="90"
-                step="5" />
-            </div>
-
-            <div class="control-group">
-              <label>
-                Brightness
-                <span id="brightnessValue">100</span>
-              </label>
-              <input
-                type="range"
-                id="brightnessSlider"
-                min="50"
-                max="200"
-                value="100"
-                step="5" />
-            </div>
-
-            <div class="control-group">
-              <label>Rotate</label>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap">
-                <button
-                  class="btn btn-accent rotate-btn"
-                  data-degrees="0"
-                  style="flex: 1">
-                  ↺ 0°
-                </button>
-                <button
-                  class="btn btn-accent rotate-btn"
-                  data-degrees="90"
-                  style="flex: 1">
-                  ↻ 90°
-                </button>
-                <button
-                  class="btn btn-accent rotate-btn"
-                  data-degrees="180"
-                  style="flex: 1">
-                  ↻ 180°
-                </button>
-                <button
-                  class="btn btn-accent rotate-btn"
-                  data-degrees="270"
-                  style="flex: 1">
-                  ↻ 270°
-                </button>
-              </div>
-            </div>
-
-            <div class="control-group">
-              <label>PNG Output Quality</label>
-              <select id="qualitySelect">
-                <option value="720">HD (720p)</option>
-                <option value="1080">Full HD (1080p)</option>
-                <option value="1440">2K (1440p)</option>
-                <option value="2160" selected>4K (2160p) - Default</option>
-                <option value="4320">8K (4320p) - Ultra</option>
-              </select>
-            </div>
-
-            <div class="control-group">
-              <label>Font Size</label>
-              <select id="fontSizeSelect">
-                <option value="2">Small (2px)</option>
-                <option value="3">Medium (3px)</option>
-                <option value="4" selected>Normal (4px)</option>
-                <option value="5">Large (5px)</option>
-                <option value="6">Extra Large (6px)</option>
-                <option value="8">Giant (8px)</option>
-              </select>
-            </div>
-
-            <!-- Character Set Selection -->
-            <div class="control-group">
-              <label>Character Set</label>
-              <select id="charSetSelect">
-                <option value="all" selected>All Characters (Default)</option>
-                <option value="binary">Binary Format (1-0)</option>
-                <option value="az">A-Z Only</option>
-                <option value="numbers">0-9 Only</option>
-                <option value="symbols">Symbols Only (@#/`2)</option>
-              </select>
-              <div
-                style="
-                  font-size: 0.75rem;
-                  color: var(--text-secondary);
-                  margin-top: 4px;
-                ">
-                <span id="charSetPreview">All Characters: 86 characters</span>
-              </div>
-            </div>
-
-            <!-- Color Picker -->
-            <div class="control-group">
-              <label>
-                🎨 Text Color (for monochrome mode)
-                <span
-                  id="colorPreview"
-                  style="
-                    display: inline-block;
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 4px;
-                    border: 1px solid var(--border-color);
-                    vertical-align: middle;
-                  "></span>
-              </label>
-              <div style="display: flex; gap: 8px; align-items: center">
-                <input
-                  type="color"
-                  id="textColorPicker"
-                  value="#e6edf3"
-                  style="
-                    width: 50px;
-                    height: 40px;
-                    padding: 2px;
-                    border-radius: 6px;
-                    border: 1px solid var(--border-color);
-                    background: var(--bg-primary);
-                    cursor: pointer;
-                  " />
-                <input
-                  type="text"
-                  id="textColorHex"
-                  value="#e6edf3"
-                  style="
-                    flex: 1;
-                    padding: 8px 12px;
-                    border-radius: 6px;
-                    border: 1px solid var(--border-color);
-                    background: var(--bg-primary);
-                    color: var(--text-primary);
-                    font-size: 0.9rem;
-                    direction: ltr;
-                    text-align: left;
-                  " />
-                <button class="btn" id="resetColorBtn" title="Reset to default">
-                  ↺
-                </button>
-              </div>
-              <div
-                style="
-                  display: flex;
-                  gap: 6px;
-                  margin-top: 6px;
-                  flex-wrap: wrap;
-                ">
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #e6edf3;
-                    color: #0d1117;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Default
-                </button>
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #ff6b6b;
-                    color: white;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Red
-                </button>
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #ffd93d;
-                    color: #0d1117;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Yellow
-                </button>
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #6bcb77;
-                    color: white;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Green
-                </button>
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #4d96ff;
-                    color: white;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Blue
-                </button>
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #9b59b6;
-                    color: white;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Purple
-                </button>
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #ff6b9d;
-                    color: white;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Pink
-                </button>
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #00d2d3;
-                    color: white;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Teal
-                </button>
-                <button
-                  class="btn color-preset"
-                  style="
-                    background: #ff9f43;
-                    color: white;
-                    padding: 4px 10px;
-                    font-size: 0.75rem;
-                  ">
-                  Orange
-                </button>
-              </div>
-            </div>
-
-            <div class="checkbox-group">
-              <input type="checkbox" id="colorMode" checked />
-              <label for="colorMode">🎨 Color Mode (use image colors)</label>
-            </div>
-
-            <div class="checkbox-group">
-              <input type="checkbox" id="invertMode" />
-              <label for="invertMode">🔄 Invert Colors</label>
-            </div>
-
-            <div class="action-buttons">
-              <button class="btn btn-primary" id="processBtn">
-                ⚡ Process
-              </button>
-              <button class="btn btn-accent" id="copyBtn">📋 Copy</button>
-              <button class="btn" id="downloadBtn">⬇️ Download TXT</button>
-              <button class="btn btn-accent" id="downloadSvgBtn">
-                📐 Download SVG
-              </button>
-              <button class="btn btn-success" id="downloadPngBtn">
-                💎 Download PNG
-              </button>
-              <button class="btn btn-info" id="downloadHtmlBtn">
-                🌐 Download HTML
-              </button>
-              <button class="btn btn-danger" id="clearBtn">🗑️ Clear</button>
-            </div>
+    <div class="app-wrapper">
+      <div class="container">
+        <!-- Header -->
+        <div class="header">
+          <h1>🎨 ASCII Art Pro</h1>
+          <div class="header-controls">
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+              🌙
+            </button>
           </div>
         </div>
 
-        <!-- Right: ASCII Output -->
-        <div class="ascii-panel">
-          <div class="header-bar">
-            <div class="stats">
-              <span id="fileNameDisplay">-</span> &nbsp;|&nbsp; Dimensions:
-              <span id="dimensions">-</span> &nbsp;|&nbsp; Characters:
-              <span id="charCount">-</span>
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+          <span class="icon">🖼️</span>
+          <p><strong>Drop your image here</strong> or click to browse</p>
+          <p style="font-size: 0.85rem; color: var(--text-secondary)">
+            PNG, JPG, JPEG, WEBP, BMP
+          </p>
+          <input type="file" id="upload" accept="image/*" />
+        </div>
+
+        <!-- Hidden Canvas -->
+        <canvas id="canvas" style="display: none"></canvas>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+          <!-- Left: Preview & Controls (Scrollable) -->
+          <div class="left-panel">
+            <!-- Preview -->
+            <div class="preview-panel">
+              <h3>📷 Image Preview</h3>
+              <div class="preview-container" id="previewContainer">
+                <div class="placeholder" id="placeholder">
+                  🖼️ Your image will appear here
+                </div>
+                <img id="previewImage" alt="Preview" />
+              </div>
             </div>
-            <div class="stats" id="processingTime"></div>
+
+            <!-- Controls -->
+            <div class="controls">
+              <!-- Rotate (همیشه نمایش داده میشه) -->
+              <div class="control-group">
+                <label>Rotate</label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                  <button
+                    class="btn btn-accent rotate-btn"
+                    data-degrees="0"
+                    style="flex: 1">
+                    ↺ 0°
+                  </button>
+                  <button
+                    class="btn btn-accent rotate-btn"
+                    data-degrees="90"
+                    style="flex: 1">
+                    ↻ 90°
+                  </button>
+                  <button
+                    class="btn btn-accent rotate-btn"
+                    data-degrees="180"
+                    style="flex: 1">
+                    ↻ 180°
+                  </button>
+                  <button
+                    class="btn btn-accent rotate-btn"
+                    data-degrees="270"
+                    style="flex: 1">
+                    ↻ 270°
+                  </button>
+                </div>
+              </div>
+
+              <!-- Advanced Options Toggle -->
+              <button class="btn btn-advanced" id="advancedToggle">
+                ⚙️ Advanced Options <span id="advancedArrow">▶</span>
+              </button>
+
+              <!-- Advanced Options -->
+              <div id="advancedOptions" style="display: none">
+                <!-- Output Width -->
+                <div class="control-group">
+                  <label>Output Width <span id="widthValue">400</span></label>
+                  <input
+                    type="range"
+                    id="widthSlider"
+                    min="100"
+                    max="600"
+                    value="400"
+                    step="10" />
+                </div>
+
+                <!-- Aspect Ratio -->
+                <div class="control-group">
+                  <label>Aspect Ratio <span id="ratioValue">0.80</span></label>
+                  <input
+                    type="range"
+                    id="ratioSlider"
+                    min="0.3"
+                    max="0.8"
+                    value="0.8"
+                    step="0.01" />
+                </div>
+
+                <!-- Contrast -->
+                <div class="control-group">
+                  <label>Contrast <span id="contrastValue">90</span></label>
+                  <input
+                    type="range"
+                    id="contrastSlider"
+                    min="0"
+                    max="200"
+                    value="90"
+                    step="5" />
+                </div>
+
+                <!-- Brightness -->
+                <div class="control-group">
+                  <label
+                    >Brightness <span id="brightnessValue">100</span></label
+                  >
+                  <input
+                    type="range"
+                    id="brightnessSlider"
+                    min="50"
+                    max="200"
+                    value="100"
+                    step="5" />
+                </div>
+
+                <!-- Sharpness -->
+                <div class="control-group">
+                  <label>Sharpness <span id="sharpnessValue">0</span></label>
+                  <input
+                    type="range"
+                    id="sharpnessSlider"
+                    min="0"
+                    max="100"
+                    value="0"
+                    step="1" />
+                  <span style="font-size: 0.7rem; color: var(--text-secondary)"
+                    >0 = Normal, 100 = Maximum Sharpening</span
+                  >
+                </div>
+
+                <!-- Shadows -->
+                <div class="control-group">
+                  <label>Shadows <span id="shadowsValue">0</span></label>
+                  <input
+                    type="range"
+                    id="shadowsSlider"
+                    min="-50"
+                    max="50"
+                    value="0"
+                    step="1" />
+                  <span style="font-size: 0.7rem; color: var(--text-secondary)"
+                    >-50 = Darker, +50 = Lighter</span
+                  >
+                </div>
+
+                <!-- Noise Reduction -->
+                <div class="control-group">
+                  <label>Noise Reduction <span id="noiseValue">0</span></label>
+                  <input
+                    type="range"
+                    id="noiseSlider"
+                    min="0"
+                    max="100"
+                    value="0"
+                    step="1" />
+                  <span style="font-size: 0.7rem; color: var(--text-secondary)"
+                    >0 = None, 100 = Maximum</span
+                  >
+                </div>
+              </div>
+
+              <!-- سایر تنظیمات (همیشه نمایش داده میشه) -->
+              <div class="control-group">
+                <label>PNG Output Quality</label>
+                <select id="qualitySelect">
+                  <option value="720">HD (720p)</option>
+                  <option value="1080">Full HD (1080p)</option>
+                  <option value="1440">2K (1440p)</option>
+                  <option value="2160" selected>4K (2160p) - Default</option>
+                  <option value="4320">8K (4320p) - Ultra</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <label>Font Size</label>
+                <select id="fontSizeSelect">
+                  <option value="2">Small (2px)</option>
+                  <option value="3">Medium (3px)</option>
+                  <option value="4" selected>Normal (4px)</option>
+                  <option value="5">Large (5px)</option>
+                  <option value="6">Extra Large (6px)</option>
+                  <option value="8">Giant (8px)</option>
+                </select>
+              </div>
+
+              <!-- Character Set Selection -->
+              <div class="control-group">
+                <label>Character Set</label>
+                <select id="charSetSelect">
+                  <option value="all" selected>All Characters (Default)</option>
+                  <option value="binary">Binary Format (1-0)</option>
+                  <option value="az">A-Z Only</option>
+                  <option value="numbers">0-9 Only</option>
+                  <option value="symbols">Symbols Only (@#/`2)</option>
+                </select>
+                <div
+                  style="
+                    font-size: 0.75rem;
+                    color: var(--text-secondary);
+                    margin-top: 4px;
+                  ">
+                  <span id="charSetPreview">All Characters: 86 characters</span>
+                </div>
+              </div>
+
+              <!-- Color Picker -->
+              <div class="control-group">
+                <label>
+                  🎨 Text Color (for monochrome mode)
+                  <span
+                    id="colorPreview"
+                    style="
+                      display: inline-block;
+                      width: 20px;
+                      height: 20px;
+                      border-radius: 4px;
+                      border: 1px solid var(--border-color);
+                      vertical-align: middle;
+                    "></span>
+                </label>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <input
+                    type="color"
+                    id="textColorPicker"
+                    value="#e6edf3"
+                    style="
+                      width: 50px;
+                      height: 40px;
+                      padding: 2px;
+                      border-radius: 6px;
+                      border: 1px solid var(--border-color);
+                      background: var(--bg-primary);
+                      cursor: pointer;
+                    " />
+                  <input
+                    type="text"
+                    id="textColorHex"
+                    value="#e6edf3"
+                    style="
+                      flex: 1;
+                      padding: 8px 12px;
+                      border-radius: 6px;
+                      border: 1px solid var(--border-color);
+                      background: var(--bg-primary);
+                      color: var(--text-primary);
+                      font-size: 0.9rem;
+                      direction: ltr;
+                      text-align: left;
+                    " />
+                  <button
+                    class="btn"
+                    id="resetColorBtn"
+                    title="Reset to default">
+                    ↺
+                  </button>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    gap: 6px;
+                    margin-top: 6px;
+                    flex-wrap: wrap;
+                  ">
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #e6edf3;
+                      color: #0d1117;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Default
+                  </button>
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #ff6b6b;
+                      color: white;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Red
+                  </button>
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #ffd93d;
+                      color: #0d1117;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Yellow
+                  </button>
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #6bcb77;
+                      color: white;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Green
+                  </button>
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #4d96ff;
+                      color: white;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Blue
+                  </button>
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #9b59b6;
+                      color: white;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Purple
+                  </button>
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #ff6b9d;
+                      color: white;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Pink
+                  </button>
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #00d2d3;
+                      color: white;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Teal
+                  </button>
+                  <button
+                    class="btn color-preset"
+                    style="
+                      background: #ff9f43;
+                      color: white;
+                      padding: 4px 10px;
+                      font-size: 0.75rem;
+                    ">
+                    Orange
+                  </button>
+                </div>
+              </div>
+
+              <div class="checkbox-group">
+                <input type="checkbox" id="colorMode" checked />
+                <label for="colorMode">🎨 Color Mode (use image colors)</label>
+              </div>
+
+              <div class="checkbox-group">
+                <input type="checkbox" id="invertMode" />
+                <label for="invertMode">🔄 Invert Colors</label>
+              </div>
+
+              <div class="action-buttons">
+                <button class="btn btn-primary" id="processBtn">
+                  ⚡ Process
+                </button>
+                <button class="btn btn-accent" id="copyBtn">📋 Copy</button>
+                <button class="btn" id="downloadBtn">⬇️ Download TXT</button>
+                <button class="btn btn-accent" id="downloadSvgBtn">
+                  📐 Download SVG
+                </button>
+                <button class="btn btn-success" id="downloadPngBtn">
+                  💎 Download PNG
+                </button>
+                <button class="btn btn-info" id="downloadHtmlBtn">
+                  🌐 Download HTML
+                </button>
+                <button class="btn btn-danger" id="clearBtn">🗑️ Clear</button>
+              </div>
+            </div>
           </div>
 
-          <!-- Tabs -->
-          <div class="tab-container">
-            <button class="tab-btn active" data-tab="image">🖼️ Image</button>
-            <button class="tab-btn" data-tab="ascii">📝 ASCII</button>
-          </div>
+          <!-- Right: ASCII Output (Fixed) -->
+          <div class="right-panel">
+            <div class="ascii-panel">
+              <div class="header-bar">
+                <div class="stats">
+                  <span id="fileNameDisplay">-</span> &nbsp;|&nbsp; Dimensions:
+                  <span id="dimensions">-</span> &nbsp;|&nbsp; Characters:
+                  <span id="charCount">-</span>
+                </div>
+                <div class="stats" id="processingTime"></div>
+              </div>
 
-          <div id="asciiContainer">
-            <div class="loading" id="loading">
-              <div class="spinner"></div>
-              <span>Processing...</span>
-            </div>
+              <!-- Tabs -->
+              <div class="tab-container">
+                <button class="tab-btn active" data-tab="image">
+                  🖼️ Image
+                </button>
+                <button class="tab-btn" data-tab="ascii">📝 ASCII</button>
+              </div>
 
-            <!-- Tab: Image View -->
-            <div class="tab-content active" id="tabImage">
-              <canvas id="imageCanvas"></canvas>
-            </div>
+              <div id="asciiContainer">
+                <div class="loading" id="loading">
+                  <div class="spinner"></div>
+                  <span>Processing...</span>
+                </div>
 
-            <!-- Tab: ASCII View -->
-            <div class="tab-content" id="tabAscii">
-              <pre id="ascii">📤 Upload an image to generate ASCII art...</pre>
+                <div class="tab-content active" id="tabImage">
+                  <canvas id="imageCanvas"></canvas>
+                </div>
+
+                <div class="tab-content" id="tabAscii">
+                  <pre id="ascii">
+📤 Upload an image to generate ASCII art...</pre
+                  >
+                </div>
+              </div>
             </div>
           </div>
         </div>

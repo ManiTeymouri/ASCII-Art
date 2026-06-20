@@ -31,6 +31,17 @@ const invertModeCheck = document.getElementById("invertMode");
 const themeToggle = document.getElementById("themeToggle");
 const rotateBtns = document.querySelectorAll(".rotate-btn");
 
+// Advanced Controls
+const advancedToggle = document.getElementById("advancedToggle");
+const advancedOptions = document.getElementById("advancedOptions");
+const advancedArrow = document.getElementById("advancedArrow");
+const sharpnessSlider = document.getElementById("sharpnessSlider");
+const sharpnessValue = document.getElementById("sharpnessValue");
+const shadowsSlider = document.getElementById("shadowsSlider");
+const shadowsValue = document.getElementById("shadowsValue");
+const noiseSlider = document.getElementById("noiseSlider");
+const noiseValue = document.getElementById("noiseValue");
+
 // Color Picker
 const textColorPicker = document.getElementById("textColorPicker");
 const textColorHex = document.getElementById("textColorHex");
@@ -263,6 +274,27 @@ let isProcessing = false;
 let currentTab = "image";
 let customTextColor = "#e6edf3";
 let currentCharSet = "all";
+let advancedOpen = false;
+
+// ====== Advanced Toggle ======
+advancedToggle.addEventListener("click", () => {
+  advancedOpen = !advancedOpen;
+  advancedOptions.style.display = advancedOpen ? "block" : "none";
+  advancedArrow.textContent = advancedOpen ? "▼" : "▶";
+});
+
+// ====== Update Advanced Labels ======
+sharpnessSlider.addEventListener("input", () => {
+  sharpnessValue.textContent = sharpnessSlider.value;
+});
+
+shadowsSlider.addEventListener("input", () => {
+  shadowsValue.textContent = shadowsSlider.value;
+});
+
+noiseSlider.addEventListener("input", () => {
+  noiseValue.textContent = noiseSlider.value;
+});
 
 // ====== Theme ======
 themeToggle.addEventListener("click", () => {
@@ -317,7 +349,6 @@ charSetSelect.addEventListener("change", () => {
   }
 });
 
-// Update preview on load
 charSetPreview.textContent = `All Characters: ${CHARACTER_SETS.all.chars.length} characters`;
 
 // ====== Color Picker ======
@@ -452,6 +483,115 @@ function generateFileName(originalName, quality) {
   return `${dateStr}_${timeStr}_${nameWithoutExt}_${qualityName}`;
 }
 
+// ====== Advanced Image Processing Functions ======
+
+// تابع افزایش وضوح (Sharpness)
+function applySharpness(imageData, amount) {
+  if (amount === 0) return imageData;
+
+  const width = imageData.width;
+  const height = imageData.height;
+  const src = imageData.data;
+  const output = new Uint8ClampedArray(src);
+
+  const kernel = [0, -1, 0, -1, 4 + amount * 0.1, -1, 0, -1, 0];
+
+  const kernelSum = kernel.reduce((a, b) => a + b, 0);
+  const normalizedKernel = kernel.map((k) => k / (kernelSum || 1));
+
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      for (let c = 0; c < 3; c++) {
+        let sum = 0;
+        for (let ky = -1; ky <= 1; ky++) {
+          for (let kx = -1; kx <= 1; kx++) {
+            const weight = normalizedKernel[(ky + 1) * 3 + (kx + 1)];
+            const pixelIndex = ((y + ky) * width + (x + kx)) * 4 + c;
+            sum += src[pixelIndex] * weight;
+          }
+        }
+        const target = (y * width + x) * 4 + c;
+        output[target] = Math.max(0, Math.min(255, sum));
+      }
+    }
+  }
+
+  imageData.data.set(output);
+  return imageData;
+}
+
+// تابع تنظیم Shadows
+function applyShadows(imageData, amount) {
+  if (amount === 0) return imageData;
+
+  const src = imageData.data;
+  const output = new Uint8ClampedArray(src);
+
+  for (let i = 0; i < src.length; i += 4) {
+    const r = src[i];
+    const g = src[i + 1];
+    const b = src[i + 2];
+    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    if (gray < 128) {
+      const shadowFactor = 1 - gray / 128;
+      const strength = shadowFactor * (amount / 50);
+
+      output[i] = Math.max(0, Math.min(255, r + r * strength));
+      output[i + 1] = Math.max(0, Math.min(255, g + g * strength));
+      output[i + 2] = Math.max(0, Math.min(255, b + b * strength));
+    } else {
+      output[i] = r;
+      output[i + 1] = g;
+      output[i + 2] = b;
+    }
+  }
+
+  imageData.data.set(output);
+  return imageData;
+}
+
+// تابع کاهش نویز (Noise Reduction)
+function applyNoiseReduction(imageData, amount) {
+  if (amount === 0) return imageData;
+
+  const width = imageData.width;
+  const height = imageData.height;
+  const src = imageData.data;
+  const output = new Uint8ClampedArray(src);
+
+  const strength = amount / 100;
+
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      for (let c = 0; c < 3; c++) {
+        const centerIndex = (y * width + x) * 4 + c;
+        const center = src[centerIndex];
+
+        let sum = 0;
+        let weightSum = 0;
+        for (let ky = -1; ky <= 1; ky++) {
+          for (let kx = -1; kx <= 1; kx++) {
+            const pixelIndex = ((y + ky) * width + (x + kx)) * 4 + c;
+            const val = src[pixelIndex];
+            const diff = Math.abs(val - center);
+            const weight = Math.exp(-diff / 30);
+            sum += val * weight;
+            weightSum += weight;
+          }
+        }
+
+        const avg = sum / weightSum;
+        const blend = strength * 0.6;
+        output[centerIndex] = Math.round(center * (1 - blend) + avg * blend);
+      }
+    }
+  }
+
+  imageData.data.set(output);
+  return imageData;
+}
+
 // ====== Image Processing ======
 
 function rotateImageData(imageData, degrees) {
@@ -506,11 +646,7 @@ function rotateImageData(imageData, degrees) {
     }
   }
 
-  return {
-    data: dst,
-    width: newWidth,
-    height: newHeight,
-  };
+  return { data: dst, width: newWidth, height: newHeight };
 }
 
 function denoiseImageLight(imageData) {
@@ -553,11 +689,7 @@ function denoiseImageLight(imageData) {
     }
   }
 
-  return {
-    data: output,
-    width: width,
-    height: height,
-  };
+  return { data: output, width: width, height: height };
 }
 
 function sharpenImageAdaptive(imageData) {
@@ -595,11 +727,7 @@ function sharpenImageAdaptive(imageData) {
     }
   }
 
-  return {
-    data: output,
-    width: width,
-    height: height,
-  };
+  return { data: output, width: width, height: height };
 }
 
 function unsharpMask(imageData, amount = 0.2, radius = 1) {
@@ -632,11 +760,7 @@ function unsharpMask(imageData, amount = 0.2, radius = 1) {
     output[i] = Math.max(0, Math.min(255, src[i] + amount * diff));
   }
 
-  return {
-    data: output,
-    width: width,
-    height: height,
-  };
+  return { data: output, width: width, height: height };
 }
 
 function applyBrightness(imageData, brightnessPercent) {
@@ -648,11 +772,7 @@ function applyBrightness(imageData, brightnessPercent) {
     output[i] = Math.max(0, Math.min(255, Math.round(src[i] * factor)));
   }
 
-  return {
-    data: output,
-    width: imageData.width,
-    height: imageData.height,
-  };
+  return { data: output, width: imageData.width, height: imageData.height };
 }
 
 function convertImageToAscii(
@@ -665,6 +785,9 @@ function convertImageToAscii(
   invert,
   rotation,
   charSet,
+  sharpness,
+  shadows,
+  noise,
 ) {
   const height = Math.floor(img.height * (width / img.width) * ratio);
 
@@ -692,6 +815,19 @@ function convertImageToAscii(
 
   let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
+  // اعمال Advanced تنظیمات (Sharpness, Shadows, Noise Reduction)
+  if (noise > 0) {
+    imageData = applyNoiseReduction(imageData, noise);
+  }
+
+  if (shadows !== 0) {
+    imageData = applyShadows(imageData, shadows);
+  }
+
+  if (sharpness > 0) {
+    imageData = applySharpness(imageData, sharpness);
+  }
+
   if (rotation !== 0) {
     const rotated = rotateImageData(imageData, rotation);
     imageData = {
@@ -702,32 +838,16 @@ function convertImageToAscii(
   }
 
   let result = denoiseImageLight(imageData);
-  imageData = {
-    data: result.data,
-    width: result.width,
-    height: result.height,
-  };
+  imageData = { data: result.data, width: result.width, height: result.height };
 
   result = sharpenImageAdaptive(imageData);
-  imageData = {
-    data: result.data,
-    width: result.width,
-    height: result.height,
-  };
+  imageData = { data: result.data, width: result.width, height: result.height };
 
   result = unsharpMask(imageData, 0.15, 1);
-  imageData = {
-    data: result.data,
-    width: result.width,
-    height: result.height,
-  };
+  imageData = { data: result.data, width: result.width, height: result.height };
 
   result = applyBrightness(imageData, brightness);
-  imageData = {
-    data: result.data,
-    width: result.width,
-    height: result.height,
-  };
+  imageData = { data: result.data, width: result.width, height: result.height };
 
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = finalWidth;
@@ -762,13 +882,12 @@ function convertImageToAscii(
     width: finalWidth,
     height: finalHeight,
   };
-
   const pixels = finalImageData.data;
   let ascii = "";
   let asciiData = [];
 
-  let minGray = 255;
-  let maxGray = 0;
+  let minGray = 255,
+    maxGray = 0;
   const grays = [];
 
   for (let y = 0; y < finalHeight; y++) {
@@ -778,7 +897,6 @@ function convertImageToAscii(
       const g = pixels[index + 1];
       const b = pixels[index + 2];
       let gray = 0.299 * r + 0.587 * g + 0.114 * b;
-
       grays.push(gray);
       if (gray < minGray) minGray = gray;
       if (gray > maxGray) maxGray = gray;
@@ -788,7 +906,6 @@ function convertImageToAscii(
   const range = maxGray - minGray;
   const hasRange = range > 0;
 
-  // Get selected character set
   const selectedChars =
     CHARACTER_SETS[charSet]?.chars || CHARACTER_SETS.all.chars;
 
@@ -821,25 +938,17 @@ function convertImageToAscii(
       const charIndex = Math.floor(normalized * (selectedChars.length - 1));
       const char = selectedChars[charIndex] || " ";
 
-      asciiData.push({
-        char: char,
-        r: r,
-        g: g,
-        b: b,
-        gray: gray,
-      });
+      asciiData.push({ char: char, r: r, g: g, b: b, gray: gray });
 
       if (colorMode) {
         let rColor = Math.floor(r * 0.95);
         let gColor = Math.floor(g * 0.95);
         let bColor = Math.floor(b * 0.95);
-
         if (invert) {
           rColor = 255 - rColor;
           gColor = 255 - gColor;
           bColor = 255 - bColor;
         }
-
         ascii += `<span class="color-char" style="color:rgb(${rColor},${gColor},${bColor});">${char}</span>`;
       } else {
         ascii += `<span class="color-char" style="color:${customTextColor};">${char}</span>`;
@@ -908,13 +1017,11 @@ function renderImageTab() {
         let r = Math.min(255, Math.floor(data.r * brightnessFactor));
         let g = Math.min(255, Math.floor(data.g * brightnessFactor));
         let b = Math.min(255, Math.floor(data.b * brightnessFactor));
-
         if (invert) {
           r = 255 - r;
           g = 255 - g;
           b = 255 - b;
         }
-
         color = `rgb(${r},${g},${b})`;
       } else {
         color = customTextColor;
@@ -951,7 +1058,6 @@ function displayAscii(ascii, width, height, processingTime) {
     processingTimeEl.textContent = `⏱️ ${processingTime.toFixed(2)}ms`;
   }
 
-  // Update character set info
   const selected = charSetSelect.value;
   const set = CHARACTER_SETS[selected];
   charSetPreview.textContent = `${set.name}: ${set.chars.length} characters`;
@@ -968,7 +1074,6 @@ function displayAscii(ascii, width, height, processingTime) {
 
 // ====== Download Functions ======
 
-// ====== Download PNG ======
 function downloadPNG(
   asciiData,
   width,
@@ -1017,13 +1122,11 @@ function downloadPNG(
         let r = Math.min(255, Math.floor(data.r * brightnessFactor));
         let g = Math.min(255, Math.floor(data.g * brightnessFactor));
         let b = Math.min(255, Math.floor(data.b * brightnessFactor));
-
         if (invert) {
           r = 255 - r;
           g = 255 - g;
           b = 255 - b;
         }
-
         color = `rgb(${r},${g},${b})`;
       } else {
         color = customTextColor;
@@ -1049,7 +1152,6 @@ function downloadPNG(
   }
 }
 
-// ====== Download SVG ======
 function downloadSVG(
   asciiData,
   width,
@@ -1087,15 +1189,17 @@ function downloadSVG(
         let r = Math.min(255, Math.floor(data.r * brightnessFactor));
         let g = Math.min(255, Math.floor(data.g * brightnessFactor));
         let b = Math.min(255, Math.floor(data.b * brightnessFactor));
-
         if (invert) {
           r = 255 - r;
           g = 255 - g;
           b = 255 - b;
         }
-
         color = `rgb(${r},${g},${b})`;
       } else {
+        let gray = Math.min(255, Math.floor(data.gray * brightnessFactor));
+        if (invert) {
+          gray = 255 - gray;
+        }
         color = customTextColor;
       }
 
@@ -1116,7 +1220,6 @@ function downloadSVG(
   URL.revokeObjectURL(url);
 }
 
-// ====== Download HTML ======
 function downloadHTML(
   asciiData,
   width,
@@ -1133,7 +1236,6 @@ function downloadHTML(
   const brightnessFactor = brightness / 100;
   let index = 0;
 
-  // Get selected character set
   const selected = charSetSelect.value;
   const set = CHARACTER_SETS[selected];
   const charSetName = set.name;
@@ -1148,13 +1250,11 @@ function downloadHTML(
         let r = Math.min(255, Math.floor(data.r * brightnessFactor));
         let g = Math.min(255, Math.floor(data.g * brightnessFactor));
         let b = Math.min(255, Math.floor(data.b * brightnessFactor));
-
         if (invert) {
           r = 255 - r;
           g = 255 - g;
           b = 255 - b;
         }
-
         color = `rgb(${r},${g},${b})`;
       } else {
         let gray = Math.min(255, Math.floor(data.gray * brightnessFactor));
@@ -1194,12 +1294,7 @@ function downloadHTML(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASCII Art - ${fileName}</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: ${bgColor};
       color: ${textColor};
@@ -1211,14 +1306,7 @@ function downloadHTML(
       align-items: center;
       flex-direction: column;
     }
-
-    .container {
-      max-width: 1400px;
-      width: 100%;
-      margin: auto;
-      text-align: center;
-    }
-
+    .container { max-width: 1400px; width: 100%; margin: auto; text-align: center; }
     h1 {
       font-size: 2rem;
       margin-bottom: 20px;
@@ -1226,19 +1314,13 @@ function downloadHTML(
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-
     .info {
       margin-bottom: 20px;
       color: ${textColor};
       opacity: 0.7;
       font-size: 0.9rem;
     }
-
-    .info span {
-      opacity: 1;
-      font-weight: 600;
-    }
-
+    .info span { opacity: 1; font-weight: 600; }
     .ascii-container {
       background: ${bgColor};
       border-radius: 12px;
@@ -1250,7 +1332,6 @@ function downloadHTML(
       direction: ltr;
       box-shadow: ${darkMode ? "0 8px 32px rgba(0,0,0,0.4)" : "0 8px 32px rgba(0,0,0,0.1)"};
     }
-
     .ascii-art {
       font-family: "Courier New", "Consolas", monospace;
       font-size: ${fontSize}px;
@@ -1264,38 +1345,20 @@ function downloadHTML(
       text-rendering: geometricPrecision;
       color: ${textColor};
     }
-
-    .ascii-art span {
-      display: inline;
-      font-family: inherit !important;
-      letter-spacing: 0px !important;
-    }
-
+    .ascii-art span { display: inline; font-family: inherit !important; letter-spacing: 0px !important; }
     .footer {
       margin-top: 30px;
       color: ${textColor};
       opacity: 0.5;
       font-size: 0.8rem;
     }
-
     @media (max-width: 768px) {
-      .ascii-art {
-        font-size: ${Math.max(2, fontSize - 1)}px;
-        line-height: ${Math.max(2, fontSize - 1) * 1.15}px;
-      }
-      h1 {
-        font-size: 1.3rem;
-      }
-      .container {
-        padding: 10px;
-      }
+      .ascii-art { font-size: ${Math.max(2, fontSize - 1)}px; line-height: ${Math.max(2, fontSize - 1) * 1.15}px; }
+      h1 { font-size: 1.3rem; }
+      .container { padding: 10px; }
     }
-
     @media (max-width: 480px) {
-      .ascii-art {
-        font-size: ${Math.max(1, fontSize - 2)}px;
-        line-height: ${Math.max(1, fontSize - 2) * 1.15}px;
-      }
+      .ascii-art { font-size: ${Math.max(1, fontSize - 2)}px; line-height: ${Math.max(1, fontSize - 2) * 1.15}px; }
     }
   </style>
 </head>
@@ -1331,7 +1394,6 @@ function downloadHTML(
 }
 
 // ====== Process Image ======
-
 async function processImage() {
   if (!currentImage || isProcessing) return;
 
@@ -1340,7 +1402,6 @@ async function processImage() {
   processBtn.disabled = true;
 
   const startTime = performance.now();
-
   await new Promise((resolve) => setTimeout(resolve, 50));
 
   const width = parseInt(widthSlider.value);
@@ -1351,6 +1412,9 @@ async function processImage() {
   const invert = invertModeCheck.checked;
   const rotation = currentRotation;
   const charSet = charSetSelect.value;
+  const sharpness = parseInt(sharpnessSlider.value);
+  const shadows = parseInt(shadowsSlider.value);
+  const noise = parseInt(noiseSlider.value);
 
   try {
     const {
@@ -1368,6 +1432,9 @@ async function processImage() {
       invert,
       rotation,
       charSet,
+      sharpness,
+      shadows,
+      noise,
     );
 
     currentAsciiData = asciiData;
@@ -1375,7 +1442,6 @@ async function processImage() {
     currentHeight = outHeight;
 
     const endTime = performance.now();
-
     const fontSize = parseInt(fontSizeSelect.value);
     asciiElement.style.fontSize = fontSize + "px";
     asciiElement.style.lineHeight = fontSize * 1.15 + "px";
@@ -1399,7 +1465,6 @@ async function processImage() {
 }
 
 // ====== Handle Image Upload ======
-
 function handleImage(file) {
   if (!file || !file.type.startsWith("image/")) {
     alert("Please select a valid image file.");
@@ -1431,7 +1496,6 @@ function handleImage(file) {
 }
 
 // ====== Event Listeners ======
-
 upload.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (file) {
@@ -1465,6 +1529,9 @@ widthSlider.addEventListener("change", processImage);
 ratioSlider.addEventListener("change", processImage);
 contrastSlider.addEventListener("change", processImage);
 brightnessSlider.addEventListener("change", processImage);
+sharpnessSlider.addEventListener("change", processImage);
+shadowsSlider.addEventListener("change", processImage);
+noiseSlider.addEventListener("change", processImage);
 
 fontSizeSelect.addEventListener("change", () => {
   if (currentAscii) {
@@ -1633,6 +1700,14 @@ clearBtn.addEventListener("click", () => {
   upload.value = "";
   loading.classList.remove("active");
 
+  // Reset advanced options
+  sharpnessSlider.value = 0;
+  sharpnessValue.textContent = "0";
+  shadowsSlider.value = 0;
+  shadowsValue.textContent = "0";
+  noiseSlider.value = 0;
+  noiseValue.textContent = "0";
+
   currentRotation = 0;
   rotateBtns.forEach((b) => b.classList.remove("active"));
   document
@@ -1675,7 +1750,7 @@ console.log(
     " character sets available",
 );
 console.log("🎨 Custom text color available!");
-console.log("🌐 Download HTML feature added!");
+console.log("⚙️ Advanced options: Sharpness, Shadows, Noise Reduction");
 console.log("⌨️ Shortcuts:");
 console.log("  Ctrl+Shift+C = Copy");
 console.log("  Ctrl+Shift+D = Download TXT");

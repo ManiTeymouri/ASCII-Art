@@ -816,3 +816,65 @@ h1 {
   color: var(--text-secondary);
   margin-top: 4px;
 }
+/* اضافه کن به انتهای فایل style.css */
+
+/* ===== Advanced Options Toggle ===== */
+.btn-advanced {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  width: 100%;
+  justify-content: center;
+  padding: 10px;
+  font-weight: 500;
+}
+
+.btn-advanced:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+.btn-advanced .arrow {
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.btn-advanced .arrow.open {
+  transform: rotate(90deg);
+}
+
+#advancedOptions {
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+  margin-top: 5px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#advancedOptions .control-group {
+  margin-bottom: 5px;
+}
+
+#advancedOptions .control-group span {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+/* ===== Responsive for Advanced Options ===== */
+@media (max-width: 768px) {
+  .btn-advanced {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+}
